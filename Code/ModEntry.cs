@@ -146,13 +146,13 @@ namespace StardewValleyExpanded
                     }
                 }
 
-                foreach (var light in Game1.currentLightSources.ToList())
+                foreach (var light in Game1.currentLightSources.Values.ToList())
                 {
                     if (light.textureIndex.Value == LightSource.townWinterTreeLight &&
                         light.position.Value == new Vector2(56, 46) * Game1.tileSize +
                         new Vector2(Game1.tileSize * 2, Game1.tileSize * 2.5f))
                     {
-                        Game1.currentLightSources.Remove(light);
+                        Game1.currentLightSources.Remove(light.Id);
                     }
                 }
             }
@@ -339,41 +339,42 @@ namespace StardewValleyExpanded
             (Game1.getLocationFromName("Forest") as Forest).marniesLivestock.Add(babyCow2);
         }
 
-        [HarmonyPatch(typeof(Town), nameof(Town.DayUpdate))]
-        public static class HalloweenStuffPatch
-        {
-            public static void Postfix(Town __instance, int dayOfMonth)
+            [HarmonyPatch(typeof(Town), nameof(Town.DayUpdate))]
+            public static class HalloweenStuffPatch
             {
-                  if (Game1.IsFall && Game1.dayOfMonth == 17)
-                  {
-                      __instance.moveObject(9, 86, 7, 89, null);
-                      __instance.moveObject(21, 89, 22, 89, null);
-                      __instance.moveObject(63, 63, 55, 68, null);
-                      __instance.tryPlaceObject(new Vector2(105, 90f), ItemRegistry.Create<StardewValley.Object>("(O)746"));
+                public static void Postfix(Town __instance, int dayOfMonth)
+                {
+                    if (Game1.IsFall && Game1.dayOfMonth == 17)
+                    {
+                        __instance.moveContents(9, 86, 7, 89, null);
+                        __instance.moveContents(21, 89, 22, 89, null);
+                        __instance.moveContents(63, 63, 55, 68, null);
+                        __instance.tryPlaceObject(new Vector2(105, 90f), ItemRegistry.Create<StardewValley.Object>("(O)746"));
 
-                      var f1 = __instance.furniture.FirstOrDefault(f => f.TileLocation == new Vector2(43, 89));
-                      if (f1 != null)
-                          f1.TileLocation = new Vector2(44, 89);
-                      
-                      var f2 = __instance.furniture.FirstOrDefault(f => f.TileLocation == new Vector2(41, 85));
-                      if (f2 != null)
-                          f2.TileLocation = new Vector2(41, 86);
-                      
-                  }
-                  if (!Game1.IsWinter || Game1.dayOfMonth != 1)
-                    return;
-                  if (!__instance.objects.ContainsKey(new Vector2(44, 89)))
-                      __instance.removeEverythingFromThisTile(44, 89);
-                  if (!__instance.objects.ContainsKey(new Vector2(41, 86)))
-                      __instance.removeEverythingFromThisTile(41, 86);
-                  __instance.removeObjectAtTileWithName(7, 89, "Rotten Plant");
-                  __instance.removeObjectAtTileWithName(22, 86, "Rotten Plant");
-                  __instance.removeObjectAtTileWithName(55, 68, "Rotten Plant");
-                  __instance.removeObjectAtTileWithName(105, 90, "Rotten Plant");
+                        var f1 = __instance.furniture.FirstOrDefault(f => f.TileLocation == new Vector2(43, 89));
+                        if (f1 != null)
+                            f1.TileLocation = new Vector2(44, 89);
+
+                        var f2 = __instance.furniture.FirstOrDefault(f => f.TileLocation == new Vector2(41, 85));
+                        if (f2 != null)
+                            f2.TileLocation = new Vector2(41, 86);
+
+                    }
+
+                    if (!Game1.IsWinter || Game1.dayOfMonth != 1)
+                        return;
+                    if (!__instance.objects.ContainsKey(new Vector2(44, 89)))
+                        __instance.removeEverythingFromThisTile(44, 89);
+                    if (!__instance.objects.ContainsKey(new Vector2(41, 86)))
+                        __instance.removeEverythingFromThisTile(41, 86);
+                    __instance.removeObjectAtTileWithName(7, 89, "Rotten Plant");
+                    __instance.removeObjectAtTileWithName(22, 86, "Rotten Plant");
+                    __instance.removeObjectAtTileWithName(55, 68, "Rotten Plant");
+                    __instance.removeObjectAtTileWithName(105, 90, "Rotten Plant");
+                }
             }
-        }
-        
-        [HarmonyPatch(typeof(GameLocation), nameof(GameLocation.DayUpdate))]
+
+            [HarmonyPatch(typeof(GameLocation), nameof(GameLocation.DayUpdate))]
         public static class HalloweenStuffPatch2
         {
             public static void Postfix(GameLocation __instance, int dayOfMonth)
